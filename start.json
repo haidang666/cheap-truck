@@ -1,0 +1,19 @@
+{
+  "apps": [
+    {
+      "script": "server.js",
+      "name": "cheap-truck",
+      "env": {
+        "NODE_ENV": "develop"
+      },
+      "exec_mode": "fork",
+      "instances": 1,
+      "error_file": "error.log",
+      "out_file": "out.log",
+      "log_date_format": "YYYY-MM-DD HH:mm Z",
+      "node_args": "--max-old-space-size=8192",
+      "merge_logs": true,
+      "max_memory_restart": "210M"
+    }
+  ]
+}
