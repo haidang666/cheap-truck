@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const url = require('url');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,20 +17,19 @@ app.put('/users/:filename', async (req, res) => {
     // Construct the target URL with the same path and query parameters
     const targetUrl = `${TARGET_HOST}/users/${filename}`;
     
-    // Forward all query parameters
-    const queryString = req.url.split('?')[1] || '';
-    const fullTargetUrl = queryString ? `${targetUrl}?${queryString}` : targetUrl;
+    // Forward all query parameters using URLSearchParams for proper encoding
+    const parsedUrl = url.parse(req.url);
+    const fullTargetUrl = parsedUrl.search ? `${targetUrl}${parsedUrl.search}` : targetUrl;
     
     console.log(`Proxying PUT request to: ${fullTargetUrl}`);
     
     // Forward the request to the target server
     const response = await axios.put(fullTargetUrl, req.body, {
       headers: {
-        'Content-Type': req.headers['content-type'] || 'application/octet-stream',
-        'Content-Length': req.headers['content-length']
+        'content-type': req.headers['content-type'] || 'application/octet-stream'
       },
-      maxBodyLength: Infinity,
-      maxContentLength: Infinity
+      maxBodyLength: 50 * 1024 * 1024, // 50mb
+      maxContentLength: 50 * 1024 * 1024 // 50mb
     });
     
     // Send back the response from the target server
