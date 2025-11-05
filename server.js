@@ -29,18 +29,29 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
     },
     data : data
   };
-  console.log(config.headers);
+
+  const useFetchResponse = await fetch(targetHostUrl, {
+    method: 'PUT',
+    headers: {
+      'content-type': 'image/png',
+      'content-length': fileExample.length,
+    },
+    body: fileExample,
+  });
+  console.log("fetch response status:", useFetchResponse.status);
+
+  // console.log(config.headers);
   // console.log(targetHostUrl);
   // return 200;
-  const result = await axios.request(config)
-  .then((response) => {
-    console.log("response from faker", response.status);
-    return response.status;
-  })
-  .catch((error) => {
-    // console.log(error);
-    return 0;
-  });
+  // const result = await axios.request(config)
+  // .then((response) => {
+  //   console.log("response from faker", response.status);
+  //   return response.status;
+  // })
+  // .catch((error) => {
+  //   // console.log(error);
+  //   return 0;
+  // });
 
   return result;
 }
