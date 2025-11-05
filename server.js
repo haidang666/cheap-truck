@@ -13,30 +13,13 @@ const TARGET_HOST =  process.env.TARGET_HOST || 'http://44.74.144.227:9000';
 app.use(express.raw({ type: '*/*', limit: '50mb' }));
 
 const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, contentType) => {
-  let data = new FormData();
-  // load example.png from root directory
-  const fileExample = fs.readFileSync('./example.png');
-  data.append('file', fileExample, 'example.png');
-
-  let config = {
-    method: 'put',
-    maxBodyLength: Infinity,
-    url: targetHostUrl,
-    headers: { 
-      // ...data.getHeaders(),
-      'content-type': 'image/png',
-      'content-length': fileExample.length,
-    },
-    data : data
-  };
-
+  // const fileExample = fs.readFileSync('./example.png');
   const useFetchResponse = await fetch(targetHostUrl, {
     method: 'PUT',
     headers: {
-      'content-type': 'image/png',
-      'content-length': fileExample.length,
+      ...headers
     },
-    body: fileExample,
+    body: fileBuffer,
   });
   console.log("fetch response status:", useFetchResponse.status);
 
@@ -53,7 +36,7 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
   //   return 0;
   // });
 
-  return result;
+  return useFetchResponse.status;
 }
 
 // PUT endpoint handler for /:bucket/:filename
