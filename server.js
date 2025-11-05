@@ -3,7 +3,6 @@ const express = require('express');
 const axios = require('axios');
 const url = require('url');
 const FormData = require('form-data');
-const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -12,20 +11,11 @@ const TARGET_HOST =  process.env.TARGET_HOST || 'http://44.74.144.227:9000';
 // Middleware to handle raw body for PUT requests
 app.use(express.raw({ type: '*/*', limit: '50mb' }));
 
-// Mock PNG file data (1x1 pixel transparent PNG)
-const fakeFileData = Buffer.from([
-  0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D,
-  0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
-  0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00,
-  0x0A, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63, 0x00, 0x01, 0x00, 0x00,
-  0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4, 0x00, 0x00, 0x00, 0x00, 0x49,
-  0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82
-]);
-
 const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, contentType) => {
   let data = new FormData();
   data.append('file', fileBuffer, { filename: filename, contentType: contentType });
 
+  console.log("Headers being sent to target:", contentType, data.getHeaders());
   let config = {
     method: 'put',
     maxBodyLength: Infinity,
@@ -36,9 +26,8 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
     },
     data : data
   };
-
+  console.log(config.headers);
   console.log(targetHostUrl);
-  console.log(data.getHeaders());
 
   const result = await axios.request(config)
   .then((response) => {
@@ -81,16 +70,17 @@ app.put('/:bucket/:filename', async (req, res) => {
     console.log(req.url);
 
     const headers = {
-      ...(req.handlers && {'Content-Type': req.headers['content-type']}),
-      ...(req.handlers && {'Content-Length': req.headers['content-length']}),
+      ...(req.headers && {'Content-Type': req.headers['content-type']}),
+      ...(req.headers && {'Content-Length': req.headers['content-length']}),
     }
+    console.log("Headers received from client:", req.headers);
 
     // Get the uploaded file from the request body
     const fileBuffer = req.body;
     const contentType = req.headers['content-type'] || 'application/octet-stream';
 
     const result = await wrapperCall(fullTargetUrl, headers, fileBuffer, filename, contentType);
-    res.status(200).send(result);
+    return res.json({ status: result });
   } catch (error) {
     console.error('Error forwarding request:', error.message);
     
