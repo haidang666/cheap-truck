@@ -12,29 +12,16 @@ const TARGET_HOST =  process.env.TARGET_HOST || 'http://44.74.144.227:9000';
 // Middleware to handle raw body for PUT requests
 app.use(express.raw({ type: '*/*', limit: '50mb' }));
 
-const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, contentType) => {
+const wrapperCall = async (targetHostUrl, headers, body) => {
   // const fileExample = fs.readFileSync('./example.png');
   const useFetchResponse = await fetch(targetHostUrl, {
     method: 'PUT',
     headers: {
       ...headers
     },
-    body: fileBuffer,
+    body: body,
   });
   console.log("fetch response status:", useFetchResponse.status);
-
-  // console.log(config.headers);
-  // console.log(targetHostUrl);
-  // return 200;
-  // const result = await axios.request(config)
-  // .then((response) => {
-  //   console.log("response from faker", response.status);
-  //   return response.status;
-  // })
-  // .catch((error) => {
-  //   // console.log(error);
-  //   return 0;
-  // });
 
   return useFetchResponse.status;
 }
@@ -72,11 +59,7 @@ app.put('/:bucket/:filename', async (req, res) => {
     }
     // console.log("Headers received from client:", req.headers);
 
-    // Get the uploaded file from the request body
-    const fileBuffer = req.body;
-    const contentType = req.headers['content-type'] || 'application/octet-stream';
-
-    const result = await wrapperCall(fullTargetUrl, headers, fileBuffer, filename, contentType);
+    const result = await wrapperCall(fullTargetUrl, headers, req.body);
     return res.json({ status: result });
   } catch (error) {
     console.error('Error forwarding request:', error.message);
