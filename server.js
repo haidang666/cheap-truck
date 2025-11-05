@@ -3,6 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const url = require('url');
 const FormData = require('form-data');
+const fs = require('fs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -13,20 +14,23 @@ app.use(express.raw({ type: '*/*', limit: '50mb' }));
 
 const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, contentType) => {
   let data = new FormData();
-  data.append('file', fileBuffer, { filename: filename, contentType: contentType });
+  // load example.png from root directory
+  const fileExample = fs.readFileSync('./example.png');
+  data.append('file', fileExample, 'example.png');
 
   let config = {
     method: 'put',
     maxBodyLength: Infinity,
     url: targetHostUrl,
     headers: { 
-      ...data.getHeaders(),
-      ...headers
+      // ...data.getHeaders(),
+      'content-type': 'image/png',
+      'content-length': fileExample.length,
     },
     data : data
   };
-  // console.log(config.headers);
-  console.log(targetHostUrl);
+  console.log(config.headers);
+  // console.log(targetHostUrl);
   // return 200;
   const result = await axios.request(config)
   .then((response) => {
