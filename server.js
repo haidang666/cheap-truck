@@ -27,7 +27,7 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
   };
   console.log(config.headers);
   console.log(targetHostUrl);
-
+  return 200;
   const result = await axios.request(config)
   .then((response) => {
     console.log("response from faker", response.status);
