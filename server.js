@@ -15,7 +15,6 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
   let data = new FormData();
   data.append('file', fileBuffer, { filename: filename, contentType: contentType });
 
-  console.log("Headers being sent to target:", contentType, data.getHeaders());
   let config = {
     method: 'put',
     maxBodyLength: Infinity,
@@ -70,8 +69,8 @@ app.put('/:bucket/:filename', async (req, res) => {
     console.log(req.url);
 
     const headers = {
-      ...(req.headers && {'Content-Type': req.headers['content-type']}),
-      ...(req.headers && {'Content-Length': req.headers['content-length']}),
+      ...(req.headers && {'content-type': req.headers['content-type']}),
+      ...(req.headers && {'content-length': req.headers['content-length']}),
     }
     console.log("Headers received from client:", req.headers);
 
