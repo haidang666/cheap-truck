@@ -25,9 +25,9 @@ const wrapperCall = async (targetHostUrl, headers, fileBuffer, filename, content
     },
     data : data
   };
-  console.log(config.headers);
+  // console.log(config.headers);
   console.log(targetHostUrl);
-  return 200;
+  // return 200;
   const result = await axios.request(config)
   .then((response) => {
     console.log("response from faker", response.status);
@@ -72,7 +72,7 @@ app.put('/:bucket/:filename', async (req, res) => {
       ...(req.headers && {'content-type': req.headers['content-type']}),
       ...(req.headers && {'content-length': req.headers['content-length']}),
     }
-    console.log("Headers received from client:", req.headers);
+    // console.log("Headers received from client:", req.headers);
 
     // Get the uploaded file from the request body
     const fileBuffer = req.body;
