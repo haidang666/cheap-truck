@@ -1,13 +1,20 @@
 require('dotenv').config();
 const express = require('express');
-const axios = require('axios');
 const url = require('url');
-const FormData = require('form-data');
 const fs = require('fs');
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const TARGET_HOST =  process.env.TARGET_HOST || 'http://44.74.144.227:9000';
+
+// Enable CORS for all routes and origins
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['*'],
+  credentials: false
+}));
 
 // Middleware to handle raw body for PUT requests
 app.use(express.raw({ type: '*/*', limit: '50mb' }));
